@@ -5,9 +5,13 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Http exposing (Error(..))
+import Json.Decode exposing (index)
+import List.Extra exposing (getAt)
 
 type alias Model =
-  { board : List (List (Maybe Mark)) }
+  { board : List (List (Maybe Mark))
+  , currentTurn : Mark
+  }
 
 init : Int -> (Model, Cmd Msg)
 init flags =
@@ -16,6 +20,7 @@ init flags =
         , [Nothing, Nothing, Nothing]
         , [Nothing, Nothing, Nothing]
         ]
+      , currentTurn = X
       }
     , Cmd.none
     )
@@ -29,6 +34,13 @@ type Mark = X | O
 
 type Msg = NoOp | SetMark (Int, Int) Mark
 
+cellAt : Int -> Int -> List (List (Maybe Mark)) -> Maybe Mark
+cellAt row column board =
+  board
+    |> getAt row
+    |> Maybe.andThen (getAt column)
+    |> Maybe.withDefault Nothing
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update message model =
     case message of
@@ -38,82 +50,118 @@ update message model =
         case indexes of
           (0, 0) ->
             ( { model | board =
-                [ [Just mark, Nothing, Nothing]
-                , [Nothing, Nothing, Nothing]
-                , [Nothing, Nothing, Nothing]
+                [ [Just mark, cellAt 0 1 model.board, cellAt 0 2 model.board]
+                , [cellAt 1 0  model.board, cellAt 1 1 model.board, cellAt 1 2 model.board]
+                , [cellAt 2 0 model.board, cellAt 2 1 model.board, cellAt 2 2 model.board]
                 ]
+              , currentTurn =
+                  case model.currentTurn of
+                    X -> O
+                    O -> X
               }
             , Cmd.none
             )
           (0, 1) ->
             ( { model | board =
-                [ [Nothing, Just mark, Nothing]
-                , [Nothing, Nothing, Nothing]
-                , [Nothing, Nothing, Nothing]
+                [ [cellAt 0 0 model.board, Just mark, cellAt 0 2 model.board]
+                , [cellAt 1 0 model.board, cellAt 1 1 model.board, cellAt 1 2 model.board]
+                , [cellAt 2 0 model.board, cellAt 2 1 model.board, cellAt 2 2 model.board]
                 ]
+                , currentTurn =
+                  case model.currentTurn of
+                    X -> O
+                    O -> X
               }
             , Cmd.none
             )
           (0, 2) ->
             ( { model | board =
-                [ [Nothing, Nothing, Just mark]
-                , [Nothing, Nothing, Nothing]
-                , [Nothing, Nothing, Nothing]
+                [ [cellAt 0 0 model.board, cellAt 0 1 model.board, Just mark]
+                , [cellAt 1 0 model.board, cellAt 1 0 model.board, cellAt 1 2 model.board]
+                , [cellAt 2 0 model.board, cellAt 2 1 model.board, cellAt 2 2 model.board]
                 ]
+                , currentTurn =
+                  case model.currentTurn of
+                    X -> O
+                    O -> X
               }
             , Cmd.none
             )
           (1, 0) ->
             ( { model | board =
-                [ [Nothing, Nothing, Nothing]
-                , [Just mark, Nothing, Nothing]
-                , [Nothing, Nothing, Nothing]
+                [ [cellAt 0 0 model.board, cellAt 0 1 model.board, cellAt 0 2 model.board]
+                , [Just mark, cellAt 1 1 model.board, cellAt 1 2 model.board]
+                , [cellAt 2 0 model.board, cellAt 2 1 model.board, cellAt 2 2 model.board]
                 ]
+                , currentTurn =
+                  case model.currentTurn of
+                    X -> O
+                    O -> X
               }
             , Cmd.none
             )
           (1, 1) ->
             ( { model | board =
-                [ [Nothing, Nothing, Nothing]
-                , [Nothing, Just mark, Nothing]
-                , [Nothing, Nothing, Nothing]
+                [ [cellAt 0 0 model.board, cellAt 0 1 model.board, cellAt 0 2 model.board]
+                , [cellAt 1 0 model.board, Just mark, cellAt 1 2 model.board]
+                , [cellAt 2 0 model.board, cellAt 2 1 model.board, cellAt 2 2 model.board]
                 ]
+                , currentTurn =
+                  case model.currentTurn of
+                    X -> O
+                    O -> X
               }
             , Cmd.none
             )
           (1, 2) ->
             ( { model | board =
-                [ [Nothing, Nothing, Nothing]
-                , [Nothing, Nothing, Just mark]
-                , [Nothing, Nothing, Nothing]
+                [ [cellAt 0 0 model.board, cellAt 0 1 model.board, cellAt 0 2 model.board]
+                , [cellAt 1 0 model.board, cellAt 1 1 model.board, Just mark]
+                , [cellAt 2 0 model.board, cellAt 2 1 model.board, cellAt 2 2 model.board]
                 ]
+                , currentTurn =
+                  case model.currentTurn of
+                    X -> O
+                    O -> X
               }
             , Cmd.none
             )
           (2, 0) ->
             ( { model | board =
-                [ [Nothing, Nothing, Nothing]
-                , [Nothing, Nothing, Nothing]
-                , [Just mark, Nothing, Nothing]
+                [ [cellAt 0 0 model.board, cellAt 0 1 model.board, cellAt 0 2 model.board]
+                , [cellAt 1 0 model.board, cellAt 1 1 model.board, cellAt 1 2 model.board]
+                , [Just mark, cellAt 2 1 model.board, cellAt 2 2 model.board]
                 ]
+                , currentTurn =
+                  case model.currentTurn of
+                    X -> O
+                    O -> X
               }
             , Cmd.none
             )
           (2, 1) ->
             ( { model | board =
-                [ [Nothing, Nothing, Nothing]
-                , [Nothing, Nothing, Nothing]
-                , [Nothing, Just mark, Nothing]
+                [ [cellAt 0 0 model.board, cellAt 0 1 model.board, cellAt 0 2 model.board]
+                , [cellAt 1 0 model.board, cellAt 1 1 model.board, cellAt 1 2 model.board]
+                , [cellAt 2 0 model.board, Just mark, cellAt 2 2 model.board]
                 ]
+                , currentTurn =
+                  case model.currentTurn of
+                    X -> O
+                    O -> X
               }
             , Cmd.none
             )
           (2, 2) ->
             ( { model | board =
-                [ [Nothing, Nothing, Nothing]
-                , [Nothing, Nothing, Nothing]
-                , [Nothing, Nothing, Just mark]
+                [ [cellAt 0 0 model.board, cellAt 0 1 model.board, cellAt 0 2 model.board]
+                , [cellAt 1 0 model.board, cellAt 1 1 model.board, cellAt 1 2 model.board]
+                , [cellAt 2 0 model.board, cellAt 2 1 model.board, Just mark]
                 ]
+                , currentTurn =
+                  case model.currentTurn of
+                    X -> O
+                    O -> X
               }
             , Cmd.none
             )
@@ -125,10 +173,12 @@ update message model =
 -- VIEW
 -- ---------------------------
 
-drawCell : Int -> Maybe Mark -> Html Msg
-drawCell index mMark =
+drawCell : Model -> Int -> Int -> Maybe Mark -> Html Msg
+drawCell model rowIndex index mMark =
   div [ class ("cell-" ++ String.fromInt index)
-      , onClick (SetMark (0, index) X)
+      , onClick <| case mMark of
+          Nothing -> (SetMark (rowIndex, index) model.currentTurn)
+          Just _ -> NoOp
       ]
       [ case mMark of
           Nothing -> text ""
@@ -136,9 +186,9 @@ drawCell index mMark =
           Just O -> text "O"
       ]
 
-drawRow : Int -> List (Maybe Mark) -> Html Msg
-drawRow index row =
-  div [ class ("row-" ++ String.fromInt index)] (List.indexedMap drawCell row)
+drawRow : Model -> Int -> List (Maybe Mark) -> Html Msg
+drawRow model index row =
+  div [ class ("row-" ++ String.fromInt index)] (List.indexedMap (drawCell model index) row)
 
 
 view : Model -> Html Msg
@@ -147,7 +197,7 @@ view model =
     [ div
       [ style "margin" "0 auto"
       , style "width" "300px" ]
-      (List.indexedMap drawRow model.board)
+      (List.indexedMap (drawRow model) model.board)
     ]
 
 
