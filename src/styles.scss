@@ -18,6 +18,21 @@ body {
   vertical-align: top;
 }
 
+.hidden {
+  display: none;
+}
+
+.position-marker {
+  border: 2px dashed red;
+  position: absolute;
+  width: 100%;
+  top: 50px;
+  left: 0;
+
+  &.top-row { top: 50px; }
+  &.middle-row { top: 150px; }
+}
+
 [class^="row"] {
   height: 100px;
 }

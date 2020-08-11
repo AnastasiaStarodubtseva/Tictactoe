@@ -233,7 +233,6 @@ showMark mark =
 -- ---------------------------
 -- VIEW
 -- ---------------------------
-
 drawCell : Model -> Int -> Int -> Maybe Mark -> Html Msg
 drawCell model rowIndex index mMark =
   div [ if mMark == Nothing
@@ -250,17 +249,35 @@ drawCell model rowIndex index mMark =
           Just O -> text "O"
       ]
 
+
 drawRow : Model -> Int -> List (Maybe Mark) -> Html Msg
 drawRow model index row =
   div [ class ("row-" ++ String.fromInt index)] (List.indexedMap (drawCell model index) row)
+
+positionMarker : GameState -> Html a
+positionMarker state =
+  div
+    [ class "position-marker"
+    , class <| case state of
+        Won _ TopRow -> "top-row"
+        Won _ MiddleRow -> "middle-row"
+        Won _ BottomRow -> "bottom-row"
+        Won _ LeftColumn -> "left-column"
+        Won _ MiddleColumn -> "middle-column"
+        Won _ RightColumn -> "right-column"
+        Won _ NWSE -> "nwse"
+        Won _ SWNE -> "swne"
+        _ -> "hidden"
+    ] []
 
 view : Model -> Html Msg
 view model =
   div []
     [ div
       [ style "margin" "0 auto"
-      , style "width" "300px" ]
-      (List.indexedMap (drawRow model) model.board)
+      , style "width" "300px"
+      , style "position" "relative"]
+      (positionMarker (determineGameState model.board) :: (List.indexedMap (drawRow model) model.board))
     , div [class "game-state"]
       [ if boardIsEmpty model.board
         then text ""
