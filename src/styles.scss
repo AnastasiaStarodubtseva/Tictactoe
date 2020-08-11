@@ -2,7 +2,7 @@
 
 body {
     background-color: #ddd;
-    margin-top: 20px;
+    margin-top: 150px;
 }
 
 [class^="cell"] {
@@ -38,4 +38,22 @@ body {
   .cell-0 { border-width: 1px 1px 0 0; }
   .cell-1 { border-width: 1px 1px 0 1px; }
   .cell-2 { border-width: 1px 0 0 1px; }
+}
+
+.game-state {
+  text-align: center;
+  margin-top: 35px;
+}
+
+.reset-button {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  cursor: pointer;
+  width: 150px;
+  height: 40px;
+  border-radius: 5px;
+  border: 1px solid #bdb7b7;
+  transform: translateX(-50%);
+
 }

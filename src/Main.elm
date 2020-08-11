@@ -209,14 +209,13 @@ view model =
       [ style "margin" "0 auto"
       , style "width" "300px" ]
       (List.indexedMap (drawRow model) model.board)
-    , if boardIsFull model.board
-      then div []  [text "Game is finished"]
-      else text "Game is not finished"
-    , button [onClick Reset] [text "Restart"]
+    , div [class "game-state"]
+      [ if boardIsFull model.board
+        then text "Game is finished"
+        else text "Game is not finished"
+      ]
+    , button [class "reset-button", onClick Reset] [text "Restart the game"]
     ]
-
-
-
 
 
 -- ---------------------------
