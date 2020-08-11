@@ -13,6 +13,13 @@ type alias Model =
   , currentTurn : Mark
   }
 
+boardIsFull : List (List (Maybe Mark)) -> Bool
+boardIsFull board =
+  List.all (\c -> c /= Nothing) (List.concat board)
+
+-- [[Maybe Mark]] -> [Maybe Mark]
+-- list.concat
+
 init : Int -> (Model, Cmd Msg)
 init flags =
     ( { board =
@@ -198,7 +205,11 @@ view model =
       [ style "margin" "0 auto"
       , style "width" "300px" ]
       (List.indexedMap (drawRow model) model.board)
+    , if boardIsFull model.board
+      then div []  [text "Game is finished"]
+      else text "Game is not finished"
     ]
+
 
 
 
