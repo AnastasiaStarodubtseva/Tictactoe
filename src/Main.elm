@@ -7,6 +7,8 @@ import Html.Events exposing (onClick)
 import Http exposing (Error(..))
 import Json.Decode exposing (index)
 import List.Extra exposing (getAt)
+import Html exposing (button)
+import Array exposing (empty)
 
 type alias Model =
   { board : List (List (Maybe Mark))
@@ -17,16 +19,16 @@ boardIsFull : List (List (Maybe Mark)) -> Bool
 boardIsFull board =
   List.all (\c -> c /= Nothing) (List.concat board)
 
--- [[Maybe Mark]] -> [Maybe Mark]
--- list.concat
+emptyBoard : List (List (Maybe Mark))
+emptyBoard =
+  [ [Nothing, Nothing, Nothing]
+  , [Nothing, Nothing, Nothing]
+  , [Nothing, Nothing, Nothing]
+  ]
 
 init : Int -> (Model, Cmd Msg)
 init flags =
-    ( { board =
-        [ [Nothing, Nothing, Nothing]
-        , [Nothing, Nothing, Nothing]
-        , [Nothing, Nothing, Nothing]
-        ]
+    ( { board = emptyBoard
       , currentTurn = X
       }
     , Cmd.none
@@ -39,7 +41,7 @@ type Mark = X | O
 -- ---------------------------
 
 
-type Msg = NoOp | SetMark (Int, Int) Mark
+type Msg = NoOp | SetMark (Int, Int) Mark | Reset
 
 cellAt : Int -> Int -> List (List (Maybe Mark)) -> Maybe Mark
 cellAt row column board =
@@ -53,6 +55,8 @@ update message model =
     case message of
       NoOp ->
         (model, Cmd.none)
+      Reset ->
+        ({ model | board = emptyBoard }, Cmd.none)
       SetMark indexes mark ->
         case indexes of
           (0, 0) ->
@@ -208,6 +212,7 @@ view model =
     , if boardIsFull model.board
       then div []  [text "Game is finished"]
       else text "Game is not finished"
+    , button [onClick Reset] [text "Restart"]
     ]
 
 
