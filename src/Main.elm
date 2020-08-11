@@ -9,6 +9,7 @@ import Json.Decode exposing (index)
 import List.Extra exposing (getAt)
 import Html exposing (button)
 import Array exposing (empty)
+import Platform.Cmd exposing (none)
 
 type alias Model =
   { board : List (List (Maybe Mark))
@@ -18,6 +19,10 @@ type alias Model =
 boardIsFull : List (List (Maybe Mark)) -> Bool
 boardIsFull board =
   List.all (\c -> c /= Nothing) (List.concat board)
+
+boardIsEmpty : List (List (Maybe Mark)) -> Bool
+boardIsEmpty board =
+  List.all (\c -> c == Nothing) (List.concat board)
 
 emptyBoard : List (List (Maybe Mark))
 emptyBoard =
@@ -39,7 +44,6 @@ type Mark = X | O
 -- ---------------------------
 -- UPDATE
 -- ---------------------------
-
 
 type Msg = NoOp | SetMark (Int, Int) Mark | Reset
 
@@ -179,7 +183,6 @@ update message model =
           _ ->
             (model, Cmd.none)
 
-
 -- ---------------------------
 -- VIEW
 -- ---------------------------
@@ -201,7 +204,6 @@ drawRow : Model -> Int -> List (Maybe Mark) -> Html Msg
 drawRow model index row =
   div [ class ("row-" ++ String.fromInt index)] (List.indexedMap (drawCell model index) row)
 
-
 view : Model -> Html Msg
 view model =
   div []
@@ -210,18 +212,20 @@ view model =
       , style "width" "300px" ]
       (List.indexedMap (drawRow model) model.board)
     , div [class "game-state"]
-      [ if boardIsFull model.board
+      [ if boardIsEmpty model.board
+        then text ""
+        else if boardIsFull model.board
         then text "Game is finished"
         else text "Game is not finished"
       ]
     , button [class "reset-button", onClick Reset] [text "Restart the game"]
     ]
 
+    -- if ... then ... else
 
 -- ---------------------------
 -- MAIN
 -- ---------------------------
-
 
 main : Program Int Model Msg
 main =
