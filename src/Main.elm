@@ -11,20 +11,22 @@ import Html exposing (button)
 import Array exposing (empty)
 import Platform.Cmd exposing (none)
 
+type alias Board = List (List (Maybe Mark))
+
 type alias Model =
-  { board : List (List (Maybe Mark))
+  { board : Board
   , currentTurn : Mark
   }
 
-boardIsFull : List (List (Maybe Mark)) -> Bool
+boardIsFull : Board -> Bool
 boardIsFull board =
   List.all (\c -> c /= Nothing) (List.concat board)
 
-boardIsEmpty : List (List (Maybe Mark)) -> Bool
+boardIsEmpty : Board -> Bool
 boardIsEmpty board =
   List.all (\c -> c == Nothing) (List.concat board)
 
-emptyBoard : List (List (Maybe Mark))
+emptyBoard : Board
 emptyBoard =
   [ [Nothing, Nothing, Nothing]
   , [Nothing, Nothing, Nothing]
@@ -47,7 +49,7 @@ type Mark = X | O
 
 type Msg = NoOp | SetMark (Int, Int) Mark | Reset
 
-cellAt : Int -> Int -> List (List (Maybe Mark)) -> Maybe Mark
+cellAt : Int -> Int -> Board -> Maybe Mark
 cellAt row column board =
   board
     |> getAt row
@@ -182,7 +184,6 @@ update message model =
             )
           _ ->
             (model, Cmd.none)
-
 -- ---------------------------
 -- VIEW
 -- ---------------------------
@@ -220,8 +221,6 @@ view model =
       ]
     , button [class "reset-button", onClick Reset] [text "Restart the game"]
     ]
-
-    -- if ... then ... else
 
 -- ---------------------------
 -- MAIN
