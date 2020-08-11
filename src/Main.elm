@@ -190,7 +190,10 @@ update message model =
 
 drawCell : Model -> Int -> Int -> Maybe Mark -> Html Msg
 drawCell model rowIndex index mMark =
-  div [ class ("cell-" ++ String.fromInt index)
+  div [ if mMark == Nothing
+        then style "cursor" "pointer"
+        else style "cursor" "default"
+      , class ("cell-" ++ String.fromInt index)
       , onClick <| case mMark of
           Nothing -> (SetMark (rowIndex, index) model.currentTurn)
           Just _ -> NoOp
