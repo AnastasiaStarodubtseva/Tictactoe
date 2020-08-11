@@ -13,6 +13,21 @@ import Platform.Cmd exposing (none)
 
 type alias Board = List (List (Maybe Mark))
 
+type GameState
+  = InProgress
+  | Won Mark Position
+  | Draw
+
+type Position
+  = NWSE
+  | SWNE
+  | MiddleColumn
+  | MiddleRow
+  | TopRow
+  | BottomRow
+  | LeftColumn
+  | RightColumn
+
 type alias Model =
   { board : Board
   , currentTurn : Mark
@@ -184,6 +199,37 @@ update message model =
             )
           _ ->
             (model, Cmd.none)
+
+
+
+determineGameState : Board -> GameState
+determineGameState board =
+  case board of
+    [[Just X, Just X, Just X], _, _] -> Won X TopRow
+    [[Just O, Just O, Just O], _, _] -> Won O TopRow
+    [ _, [Just X, Just X, Just X], _] -> Won X MiddleRow
+    [ _, [Just O, Just O, Just O], _] -> Won O MiddleRow
+    [ _, _, [Just X, Just X, Just X]] -> Won X BottomRow
+    [ _, _, [Just O, Just O, Just O]] -> Won O BottomRow
+    [[ Just X, _, _ ], [ _, Just X, _ ], [ _, _, Just X ]] -> Won X NWSE
+    [[ Just O, _, _ ], [ _, Just O, _ ], [ _, _, Just O]] -> Won O NWSE
+    [[ _, _, Just X ], [ _, Just X, _ ], [ Just X, _, _ ]] -> Won X SWNE
+    [[ _, _, Just O ], [ _, Just O, _ ], [ Just O, _, _ ]] -> Won O SWNE
+    [[ _, Just X, _ ], [ _, Just X, _ ], [ _, Just X, _ ]] -> Won X MiddleColumn
+    [[ _, Just O, _ ], [ _, Just O, _ ], [ _, Just O, _ ]] -> Won O MiddleColumn
+    [[ Just X, _, _ ], [ Just X, _, _ ], [ Just X, _, _ ]] -> Won X LeftColumn
+    [[ Just O, _, _ ], [ Just O, _, _ ], [ Just O, _, _ ]] -> Won O LeftColumn
+    [[ _, _, Just X ], [ _, _, Just X ], [ _, _, Just X ]] -> Won X RightColumn
+    [[ _, _, Just O ], [ _, _, Just O ], [ _, _, Just O ]] -> Won X RightColumn
+    [[ Just _, Just _, Just _ ], [ Just _, Just _, Just _ ], [ Just _, Just _, Just _ ]] -> Draw
+    _ -> InProgress
+
+
+showMark : Mark -> String
+showMark mark =
+  case mark of
+    X -> "X"
+    O -> "O"
 -- ---------------------------
 -- VIEW
 -- ---------------------------
@@ -218,9 +264,11 @@ view model =
     , div [class "game-state"]
       [ if boardIsEmpty model.board
         then text ""
-        else if boardIsFull model.board
-        then text "Game is finished"
-        else text "Game is not finished"
+        else
+          case determineGameState model.board of
+            InProgress -> text "Game in progress"
+            Won mark position -> text ("The winner is " ++ showMark mark)
+            Draw ->  text "No winner"
       ]
     , button [class "reset-button", onClick Reset] [text "Restart the game"]
     ]
