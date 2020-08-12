@@ -239,9 +239,13 @@ drawCell model rowIndex index mMark =
         then style "cursor" "pointer"
         else style "cursor" "default"
       , class ("cell-" ++ String.fromInt index)
-      , onClick <| case mMark of
-          Nothing -> (SetMark (rowIndex, index) model.currentTurn)
-          Just _ -> NoOp
+      , onClick <|
+          if determineGameState model.board == InProgress
+          then
+            case mMark of
+              Nothing -> (SetMark (rowIndex, index) model.currentTurn)
+              Just _ -> NoOp
+          else NoOp
       ]
       [ case mMark of
           Nothing -> text ""
