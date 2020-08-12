@@ -252,7 +252,7 @@ drawCell model rowIndex index mMark =
 
 drawRow : Model -> Int -> List (Maybe Mark) -> Html Msg
 drawRow model index row =
-  div [ class ("row-" ++ String.fromInt index)] (List.indexedMap (drawCell model index) row)
+  div [ class ("innerContainer-" ++ String.fromInt index)] (List.indexedMap (drawCell model index) row)
 
 positionMarker : GameState -> Html a
 positionMarker state =
@@ -272,9 +272,10 @@ positionMarker state =
 
 view : Model -> Html Msg
 view model =
-  div []
+  div [ ]
     [ div
-      [ style "margin" "0 auto"
+      [ class "container"
+      , style "margin" "0 auto"
       , style "width" "300px"
       , style "position" "relative"]
       (positionMarker (determineGameState model.board) :: (List.indexedMap (drawRow model) model.board))
@@ -289,6 +290,7 @@ view model =
       ]
     , button [class "reset-button", onClick Reset] [text "Restart the game"]
     ]
+
 
 -- ---------------------------
 -- MAIN
