@@ -46,6 +46,7 @@
         "webpack-merge": "^4.2.2"
     },
     "dependencies": {
+        "animate.css": "^4.1.0",
         "purecss": "^1.0.1"
     },
     "prettier": {

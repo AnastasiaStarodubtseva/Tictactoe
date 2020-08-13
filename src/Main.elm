@@ -249,8 +249,51 @@ drawCell model rowIndex index mMark =
       ]
       [ case mMark of
           Nothing -> text ""
-          Just X -> text "X"
-          Just O -> text "O"
+          Just X -> cross
+          Just O -> circle
+      ]
+
+circle : Html a
+circle =
+  div
+    [ style "border" "2px solid #fff"
+    , style "border-radius" "50%"
+    , style "width" "40px"
+    , style "height" "40px"
+    , style "position" "absolute"
+    , style "top" "50%"
+    , style "left" "50%"
+    , style "margin" "-25px 0 0 -25px"
+    , class "animate__animated"
+    , class "animate__bounceIn"
+    ] []
+
+cross : Html b
+cross =
+  div
+      [ style "width" "50px"
+      , style "height" "50px"
+      , style "position" "absolute"
+      , style "top" "50%"
+      , style "left" "50%"
+      , style "margin" "-25px 0 0 -25px"
+      , class "animate__animated"
+      , class "animate__bounceIn"
+      ]
+      [ div
+        [ style "border" "1px solid #fff"
+        , style "transform" "rotate(45deg)"
+        , style "width" "40px"
+        , style "position" "absolute"
+        , style "top" "40%"
+        ] []
+      ,div
+        [ style "border" "1px solid #fff"
+        , style "transform" "rotate(-45deg)"
+        , style "width" "40px"
+        , style "position" "absolute"
+        , style "top" "40%"
+        ] []
       ]
 
 
